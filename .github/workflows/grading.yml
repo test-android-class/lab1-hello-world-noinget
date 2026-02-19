@@ -15,6 +15,36 @@ jobs:
         distribution: 'temurin'
 
     - name: Compile
+      id: compile
       run: |
-        javac app/src/main/java/com/example/MainActivity.java
-        echo "✅ 編譯成功，作業已繳交"
+        javac app/src/main/java/com/example/MainActivity.java 2>&1 | tee compile_log.txt
+        echo "exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
+      continue-on-error: true
+
+    - name: Ask Claude for feedback
+      env:
+        BEDROCK_API_KEY: ${{ secrets.BEDROCK_API_KEY }}
+      run: |
+        COMPILE_LOG=$(cat compile_log.txt)
+        STUDENT_CODE=$(cat app/src/main/java/com/example/MainActivity.java)
+        
+        curl -s https://bedrock.us-east-1.amazonaws.com/model/anthropic.claude-haiku-4-5-20251001-v1:0/invoke \
+          -H "Authorization: Bearer $BEDROCK_API_KEY" \
+          -H "Content-Type: application/json" \
+          -d "{
+            \"anthropic_version\": \"bedrock-2023-05-31\",
+            \"max_tokens\": 300,
+            \"messages\": [{
+              \"role\": \"user\",
+              \"content\": \"你是一位Android程式設計課的助教，請用繁體中文給學生一句簡短的作業回饋。編譯結果：$COMPILE_LOG，學生程式碼：$STUDENT_CODE\"
+            }]
+          }" | tee claude_feedback.txt
+        
+        echo "=== Claude 評語 ===" 
+        cat claude_feedback.txt
+
+    - name: Upload feedback
+      uses: actions/upload-artifact@v4
+      with:
+        name: claude-feedback
+        path: claude_feedback.txt
