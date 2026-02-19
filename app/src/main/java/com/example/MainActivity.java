@@ -1,1 +1,6 @@
-這不是合法的Java程式碼
+package com.example;
+public class MainActivity {
+    public static void main(String[] args) {
+        System.out.println("Hello World");
+    }
+}
