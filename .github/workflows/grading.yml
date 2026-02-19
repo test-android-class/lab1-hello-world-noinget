@@ -28,7 +28,7 @@ jobs:
             -H "Authorization: Bearer $BEDROCK_API_KEY" \
             -H "Content-Type: application/json" \
             -d "{\"anthropic_version\":\"bedrock-2023-05-31\",\"max_tokens\":300,\"messages\":[{\"role\":\"user\",\"content\":\"你是Android課助教，用繁體中文給學生一句作業回饋。編譯結果：$LOG 程式碼：$CODE\"}]}" \
-            "https://bedrock-runtime.us-east-1.amazonaws.com/model/anthropic.claude-haiku-4-5-20251001-v1%3A0/invoke" \
+            "https://bedrock-runtime.us-east-1.amazonaws.com/model/us.anthropic.claude-haiku-4-5-20251001-v1%3A0/invoke" \
             | tee claude_feedback.txt
 
       - name: Upload feedback
