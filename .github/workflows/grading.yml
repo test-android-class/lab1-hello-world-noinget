@@ -1,0 +1,20 @@
+name: Auto Grade
+
+on: [push]
+
+jobs:
+  grade:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Compile
+      run: |
+        javac app/src/main/java/com/example/MainActivity.java
+        echo "✅ 編譯成功，作業已繳交"
